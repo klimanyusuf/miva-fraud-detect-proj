@@ -1,2 +1,1 @@
-# Streamlit Cloud manages Python automatically
-# Add system dependencies here if needed (e.g., postgresql-client, etc.)
+
