@@ -267,6 +267,10 @@ def show_dashboard():
     
     recent_df = st.session_state.df.tail(10).copy()
     
+    # Ensure bank column exists, add default if missing
+    if 'bank' not in recent_df.columns:
+        recent_df['bank'] = 'N/A'
+    
     for _, row in recent_df.iterrows():
         if row['is_fraud'] == 1:
             alert_class = "fraud-alert"
@@ -281,9 +285,10 @@ def show_dashboard():
             icon = "✓"
             status = "NORMAL"
         
+        bank_display = row.get('bank', 'N/A')
         st.markdown(f"""
         <div class="{alert_class}">
-            {icon} <strong>{status}</strong>: ₦{row['amount']:,.0f} {row['transaction_type']} via {row.get('bank', 'N/A')}
+            {icon} <strong>{status}</strong>: ₦{row['amount']:,.0f} {row['transaction_type']} via {bank_display}
             in {row['location']} at {row['timestamp'].strftime('%H:%M')}
             <br><small>Account: {row['account_age_days']} days | BVN: {'✅ Verified' if row['bvn_verified'] == 1 else '❌ Unverified'}</small>
         </div>
@@ -310,19 +315,22 @@ def show_dashboard():
     
     with col3:
         st.markdown('<h3 class="sub-header">Fraud by Nigerian Bank</h3>', unsafe_allow_html=True)
-        # Check if 'bank' column exists
-        if 'bank' in st.session_state.df.columns:
-            bank_fraud = st.session_state.df.groupby('bank')['is_fraud'].agg(['count', 'sum', 'mean']).reset_index()
-            bank_fraud.columns = ['bank', 'total_transactions', 'fraud_count', 'fraud_rate']
-            bank_fraud = bank_fraud.sort_values('fraud_rate', ascending=False).head(10)
-            fig3 = px.bar(bank_fraud, x='bank', y='fraud_rate',
-                         title='Top 10 Banks by Fraud Rate',
-                         labels={'fraud_rate': 'Fraud Rate', 'bank': 'Bank'},
-                         hover_data={'total_transactions': True, 'fraud_count': True})
-            fig3.update_layout(yaxis_tickformat=".1%", xaxis_tickangle=45)
-            st.plotly_chart(fig3, use_container_width=True)
-        else:
-            st.info("💡 Bank data not available in this dataset version")
+        try:
+            # Ensure bank column exists
+            if 'bank' not in st.session_state.df.columns:
+                st.warning("⚠️ Bank column not found in dataset")
+            else:
+                bank_fraud = st.session_state.df.groupby('bank')['is_fraud'].agg(['count', 'sum', 'mean']).reset_index()
+                bank_fraud.columns = ['bank', 'total_transactions', 'fraud_count', 'fraud_rate']
+                bank_fraud = bank_fraud.sort_values('fraud_rate', ascending=False).head(10)
+                fig3 = px.bar(bank_fraud, x='bank', y='fraud_rate',
+                             title='Top 10 Banks by Fraud Rate',
+                             labels={'fraud_rate': 'Fraud Rate', 'bank': 'Bank'},
+                             hover_data={'total_transactions': True, 'fraud_count': True})
+                fig3.update_layout(yaxis_tickformat=".1%", xaxis_tickangle=45)
+                st.plotly_chart(fig3, use_container_width=True)
+        except Exception as e:
+            st.error(f"Error displaying bank fraud data: {str(e)}")
 
 def show_fraud_detection():
     """Real-time fraud detection page"""
