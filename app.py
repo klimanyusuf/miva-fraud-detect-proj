@@ -310,15 +310,19 @@ def show_dashboard():
     
     with col3:
         st.markdown('<h3 class="sub-header">Fraud by Nigerian Bank</h3>', unsafe_allow_html=True)
-        bank_fraud = st.session_state.df.groupby('bank')['is_fraud'].agg(['count', 'sum', 'mean']).reset_index()
-        bank_fraud.columns = ['bank', 'total_transactions', 'fraud_count', 'fraud_rate']
-        bank_fraud = bank_fraud.sort_values('fraud_rate', ascending=False).head(10)
-        fig3 = px.bar(bank_fraud, x='bank', y='fraud_rate',
-                     title='Top 10 Banks by Fraud Rate',
-                     labels={'fraud_rate': 'Fraud Rate', 'bank': 'Bank'},
-                     hover_data={'total_transactions': True, 'fraud_count': True})
-        fig3.update_layout(yaxis_tickformat=".1%", xaxis_tickangle=45)
-        st.plotly_chart(fig3, use_container_width=True)
+        # Check if 'bank' column exists
+        if 'bank' in st.session_state.df.columns:
+            bank_fraud = st.session_state.df.groupby('bank')['is_fraud'].agg(['count', 'sum', 'mean']).reset_index()
+            bank_fraud.columns = ['bank', 'total_transactions', 'fraud_count', 'fraud_rate']
+            bank_fraud = bank_fraud.sort_values('fraud_rate', ascending=False).head(10)
+            fig3 = px.bar(bank_fraud, x='bank', y='fraud_rate',
+                         title='Top 10 Banks by Fraud Rate',
+                         labels={'fraud_rate': 'Fraud Rate', 'bank': 'Bank'},
+                         hover_data={'total_transactions': True, 'fraud_count': True})
+            fig3.update_layout(yaxis_tickformat=".1%", xaxis_tickangle=45)
+            st.plotly_chart(fig3, use_container_width=True)
+        else:
+            st.info("💡 Bank data not available in this dataset version")
 
 def show_fraud_detection():
     """Real-time fraud detection page"""
