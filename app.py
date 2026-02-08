@@ -797,7 +797,7 @@ st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #6B7280; font-size: 0.9rem; margin-top: 2rem;'>
     <p>Nigerian Bank Fraud Detection System | Developed for MIT 8212 Seminar</p>
-    <p>© 2024 Khalid Yusuf Liman | All rights reserved</p>
+    <p>© 2026 Khalid Yusuf Liman | All rights reserved</p>
 </div>
 """, unsafe_allow_html=True)
 
