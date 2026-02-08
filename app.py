@@ -650,6 +650,14 @@ def show_case_management():
                 'svm_flag': svm_pred,
                 'bvn_status': 'Verified' if row['bvn_verified'] == 1 else 'Unverified',
                 'risk_score': base_risk * 10 if base_risk > 0 else 5
+            })
+    
+    if flagged_cases:
+        flagged_df = pd.DataFrame(flagged_cases)
+        
+        st.markdown(f"### ⚠️ {len(flagged_df)} Cases Flagged for Review")
+        
+        # Filter options
         col1, col2 = st.columns(2)
         with col1:
             min_amount = st.number_input("Minimum Amount (₦)", value=100000)
