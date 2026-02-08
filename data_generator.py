@@ -19,10 +19,20 @@ def generate_nigerian_dataset(n_transactions=1000):
     """
     np.random.seed(42)
     
+    # Nigerian bank names
+    nigerian_banks = [
+        "First Bank of Nigeria", "Zenith Bank", "United Bank for Africa (UBA)",
+        "Guaranty Trust Bank (GTBank)", "Access Bank", "EcoBank Nigeria",
+        "Fidelity Bank", "Union Bank of Nigeria", "Stanbic IBTC Bank",
+        "First City Monument Bank (FCMB)", "Sterling Bank", "Wema Bank",
+        "Unity Bank", "Polaris Bank", "Keystone Bank"
+    ]
+    
     # Base transaction data
     data = {
         'transaction_id': range(1000, 1000 + n_transactions),
         'timestamp': pd.date_range('2024-01-01', periods=n_transactions, freq='H'),
+        'bank': np.random.choice(nigerian_banks, n_transactions),
         'amount': np.random.exponential(50000, n_transactions),
         'customer_id': np.random.randint(100, 500, n_transactions),
         'account_age_days': np.random.randint(1, 3650, n_transactions),
