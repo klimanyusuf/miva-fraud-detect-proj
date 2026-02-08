@@ -129,7 +129,7 @@ def main():
     
     # Sidebar navigation
     with st.sidebar:
-        st.image("🏦", width=100)
+        st.markdown("# 🏦 Bank Fraud Detection")
         st.markdown("## Navigation")
         
         page = st.radio(
