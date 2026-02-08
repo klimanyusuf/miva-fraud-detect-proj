@@ -36,8 +36,8 @@ def train_all_models(X, y):
         n_jobs=-1
     )
     rf_model.fit(X_train, y_train)
-    rf_pred = rf_model.predict(X_test)
     rf_proba = rf_model.predict_proba(X_test)[:, 1]
+    rf_pred = (rf_proba > 0.05).astype(int)  # Even more aggressive - catch more fraud
     
     models['Random Forest'] = {
         'model': rf_model,
@@ -60,8 +60,8 @@ def train_all_models(X, y):
         class_weight='balanced'
     )
     svm_model.fit(X_train, y_train)
-    svm_pred = svm_model.predict(X_test)
     svm_proba = svm_model.predict_proba(X_test)[:, 1]
+    svm_pred = (svm_proba > 0.10).astype(int)  # Even more aggressive
     
     models['SVM'] = {
         'model': svm_model,
@@ -77,14 +77,14 @@ def train_all_models(X, y):
     # 3. Train Isolation Forest for outlier detection
     print("Training Isolation Forest...")
     iso_model = IsolationForest(
-        contamination=0.03,
+        contamination=0.10,  # 10% - be more aggressive
         random_state=42,
         n_estimators=100,
         n_jobs=-1
     )
     iso_model.fit(X_train)
     iso_scores = iso_model.score_samples(X_test)
-    iso_pred = np.where(iso_scores < np.percentile(iso_scores, 3), 1, 0)
+    iso_pred = np.where(iso_scores < np.percentile(iso_scores, 10), 1, 0)
     
     models['Isolation Forest'] = {
         'model': iso_model,
@@ -99,7 +99,7 @@ def train_all_models(X, y):
     # 4. Create ensemble model (average probabilities)
     print("Creating ensemble model...")
     ensemble_proba = (rf_proba + svm_proba) / 2
-    ensemble_pred = (ensemble_proba > 0.5).astype(int)
+    ensemble_pred = (ensemble_proba > 0.10).astype(int)  # More aggressive
     
     models['Ensemble'] = {
         'probabilities': ensemble_proba,
