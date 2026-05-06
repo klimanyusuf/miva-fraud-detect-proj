@@ -31,7 +31,7 @@ def generate_nigerian_dataset(n_transactions=1000):
     # Base transaction data
     data = {
         'transaction_id': range(1000, 1000 + n_transactions),
-        'timestamp': pd.date_range('2024-01-01', periods=n_transactions, freq='H'),
+        'timestamp': pd.date_range('2024-01-01', periods=n_transactions, freq='h'),
         'bank': np.random.choice(nigerian_banks, n_transactions),
         'amount': np.random.exponential(50000, n_transactions),
         'customer_id': np.random.randint(100, 500, n_transactions),
